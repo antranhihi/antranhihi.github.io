@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="bubble.js"></script>
+  <script src="populateoption.js"></script>
+  <script src="test.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-format@3"></script>
+  <style>
+    /* Add your CSS styles here */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background-color: #F0F8FF;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #abcdfa;
+      padding: 10px;
+      box-sizing: border-box;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 999; /* Ensure the header is on top of other elements */
+    }
+
+    .header h1 {
+      margin: 0;
+      padding: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .nav-buttons button {
+      margin: 0 10px;
+      padding: 5px 10px;
+      font-size: 16px;
+      background-color: #ffffd0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .section {
+      padding: 20px;
+      box-sizing: border-box;
+      background-color: #ffffec;
+      border-radius: 10px;
+      margin: 20px;
+      border: 3px solid #dff0fe;
+    }
+
+    .section-title {
+      background-color: #abcdfa;
+      margin: 0;
+      padding: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #000000;
+      text-align: center;
+      position: sticky; /* Make the title sticky */
+      top: 0; /* Position it at the top of the sticky container */ 
+      z-index: 1; /* Ensure the title is on top of other elements */
+    }
+
+
+    header {
+      font-weight: bold;
+      color: navy;
+    }
+
+    .rounded-textbox {
+      border-radius: 10px;
+      /* border: 1px solid #ccc; */
+      padding: 50px;
+    }
+
+    .section-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: 0 5%;
+      /* border: 1px solid black; */
+      border-radius: 20px;
+      background-color: #fdfcfcea;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .canvas-container {
+      width: 100%;
+      height: 100%;
+      /* background-color: #f2f2f2; */
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin: 5px;
+      border-radius: 10px;
+      /* border: 1px solid black; */
+      background-color: rgba(255, 243, 227, 0.821);
+    }
+
+    .right-section {
+      width: 50%;
+      padding: 20px;
+      margin: 10px;
+      box-sizing: border-box;
+      border: 1px solid black;
+      border-radius: 10px;
+      background-color: #abd9e9;
+      height: 500px;
+      display: flex;
+      flex-direction:column;
+      justify-content: start;
+    }
+
+    select {
+      width: 100%;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      padding: 8px;
+    }
+
+    .module-holder {
+      flex: 1;
+      display: flex;
+      flex-direction: inherit;
+    }
+
+    .description-box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: white;
+      margin-top: 10px;
+      /* flex: 1; */
+      height: 100px;
+      overflow: auto;
+    }
+
+        #clip-group rect {
+            fill: rgba(255, 243, 227, 0.821);
+        }
+
+
+        #map.section {
+            margin-bottom: 100px;
+            /* background-color: #97CAEF; */
+        }
+        #bubble.section {
+            margin-top: 50px;
+        }
+
+        #background.content {
+            max-width: 700px;
+            background-color: #f7f7f7;
+        }
+        #map.content {
+            background-color: #f7f7f7;
+        }
+        .footer {
+            background-color: #2189D4;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-family: monospace;
+    }
+
+        .footer-content {
+            font-size: 14px;
+        }
+
+        #legend-svg {
+          width: 25%; /* Adjust the width as needed */
+          height: 0 auto; /* Adjust the height as needed */
+          margin: 0 auto; /* Center the SVG horizontally */
+        }
+#country {
+    background-color: #f7f7f7;
+}
+
+      .tooltip {
+            position: absolute;
+            top: 75px;
+            left: 10px;
+            padding: 8px;
+            background-color: #333;
+            color: #fff;
+            font-size: 14px;
+            border-radius: 4px;
+            z-index: 1;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            font-size:small;
+        }
+
+        .content:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .content  {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin: 30px;
+            padding: 20px;
+            text-align: left;
+            background-color:#eef8ff;
+            
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            /* max-width: 500px; */
+            margin-top: 70px;
+        }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>OECD MIGRATION DATA VISUALIZATION</h1>
+    <div class="nav-buttons">
+      <button onclick="scrollToSection('1')">Project Overview</button>
+      <button onclick="scrollToSection('2')">Map Overview of OECD Migration</button>
+      <button onclick="scrollToSection('3')">Social Indicators & Net Migration</button>
+    </div>
+  </div>
+<br>
+<br>
+<br>
+<br>
+<br>
+  <section id="section1" class="section">
+    <h2 class="section-title">Project Overview</h2>
+    <p>The Organisation for Economic Co-operation and Development (OECD) is an international organisation that works to build better policies for better lives. Its goal is to shape policies that foster prosperity, equality, opportunity and well-being for all. OCED works on establishing evidence-based international standards and finding solutions to a range of social, economic and environmental challenges. From improving economic performance and creating jobs to fostering strong education and fighting international tax evasion (OECD, n.d)
+      <p>
+      <strong>Our aim:</strong><br>
+      We aim at people who are curious about what OECD and its Better Life Index are. In this project, we try to:
+      <ul>
+          <li>Introduce countries within OECD</li>
+          <li>Introduce better life indexes</li>
+          <li>Provide data of better life indexes</li>
+          <li>Inform people of life quality of OECD countries </li>
+      </ul></p>
+      <p>
+          <strong>What is Better Life Index?</strong>
+          <br>
+          These indexes are selected and designed to help people visualize and compare key factors making a high-quality life among countries in OECD. These indexes will include a wide variety of aspects such as education, housing, environment, and so on. According to OECD, it is considered to be a easily accessible tool for everyone allowing poeple to see how well countries perform in improving the well-being of societies (oecdbetterlifeindex.org, n.d) 
+      </p>
+      <p>
+          <strong>Our interactive map:</strong>
+          <br>
+          We created a heat map featuring countries in OECD by colors. Pink colors represent countries with positive migration value, which means people have more tendency to move into these countries. On the other hand, the green color represents countries with negative migration value as shown in the color legend. All 38 countries are marked with a yellow dot that would display all related better life indexes of that country. 
+      </p>
+      <p>
+          <strong>Our bubble chart:</strong><br>
+          We integrate an informative bubble chart for people to view and analyze better life indexes of each country in a more interactive and comprehensible way. Viewers can select specific indexes to be displayed and compare with others more easily
+      </p>
+
+  </p>
+  </section>
+
+  <section id="section2" class="section">
+    <h2 class="section-title">Map Overview of OECD Migration</h2>
+    <p>This is placeholder text for Section 2.</p>
+    <div id="map">
+      <div class="content">
+          <div class="tooltip"></div>
+          <div class="content-text">
+              <h1>OECD countries</h1>
+              <p id="world_map"></p>
+          </div>
+          
+      </div>
+  </div>
+  </section>
+
+  <section id="section3" class="section">
+    <h2 class="section-title">Social Indicators & Net Migration</h2>
+    <br>
+    <br>
+    <br>
+    <div class="section-container">
+    
+      <div id="bubble" class="canvas-container">
+          
+      </div>
+    <!-- SVG canvas will be drawn using JavaScript -->
+  
+
+  <div class="right-section">
+    <div class="module-holder">
+      <label for="fea-1-select" onchange="changeValue(2)">X-Axis</label>
+      <select id="fea-1-select" class="fea-sel"></select>
+      <div id="description1" class="description-box"></div>
+    </div>
+
+    <div class="module-holder">
+      <label for="fea-2-select" onchange="changeValue(1)">Y-Axis</label>
+      <select id="fea-2-select" class="fea-sel"></select>
+      <div id="description2" class="description-box"></div>
+    </div>
+
+    <script>
+      draw();
+      update_draw();
+    </script>
+
+    <div id="generated-text"></div>
+  </div>
+</div>
+  </section>
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.swiper-container', {
+      // Configure your swiper options here
+      direction: 'horizontal',
+      loop: true,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+    });
+
+    function scrollToSection(sectionNumber) {
+      const sectionId = 'section' + sectionNumber;
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  </script>
+
+  <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; Created by Xuan Tuan Minh Le - Hanh An Tran</p>
+            </div>
+        </footer>
+</body>
+</html>
